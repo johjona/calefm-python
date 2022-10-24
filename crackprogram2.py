@@ -7,21 +7,16 @@ Main branch
 """
 
 
-import calefm_base as un
+
 import sys
 import numpy as np
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QThread, QSize
-from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QFileDialog, QMessageBox
+from PyQt5.QtCore import QThread, QSize
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QVBoxLayout
 from PyQt5.uic import loadUi
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QVBoxLayout, QSizePolicy, QMessageBox, QWidget, QPushButton
-from PyQt5.QtWidgets import QDialog, QApplication, QPushButton, QVBoxLayout
 import matplotlib.pyplot as plt
-import random
-import calfem.vis_mpl as cfv
-from math import sqrt
+import calefm_base as un
               
 
 class SolverThread(QThread):
@@ -393,7 +388,7 @@ class MainWindow(QMainWindow):
         # not can't be calculated instead show error message
         
         try:
-            load = [0.001*sqrt((self.input_data.t*self.input_data.fracture_energy)/G) for G in self.G]
+            load = [0.001*np.sqrt((self.input_data.t*self.input_data.fracture_energy)/G) for G in self.G]
             axes.plot(self.cracks, load)
             axes.set_xlabel('Crack length [m]')
             axes.set_ylabel('Critical load [kN]')
