@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>894</width>
-    <height>569</height>
+    <width>873</width>
+    <height>571</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="icon">
@@ -406,7 +406,7 @@
        <item>
         <widget class="QLabel" name="label_32">
          <property name="text">
-          <string>     Fracture energy</string>
+          <string>              Misc</string>
          </property>
         </widget>
        </item>
@@ -1026,56 +1026,17 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionNew"/>
-   <addaction name="actionSave"/>
-   <addaction name="actionSave_As"/>
-   <addaction name="actionOpen"/>
   </widget>
   <action name="actionNew">
    <property name="icon">
     <iconset>
-     <normaloff>../Icons/script.png</normaloff>../Icons/script.png</iconset>
+     <normaloff>Icons/script.png</normaloff>Icons/script.png</iconset>
    </property>
    <property name="text">
     <string>New</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionSave">
-   <property name="checkable">
-    <bool>false</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>../Icons/disk.png</normaloff>../Icons/disk.png</iconset>
-   </property>
-   <property name="text">
-    <string>Save</string>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionSave_As">
-   <property name="icon">
-    <iconset>
-     <normaloff>../Icons/disk--arrow.png</normaloff>../Icons/disk--arrow.png</iconset>
-   </property>
-   <property name="text">
-    <string>Save As</string>
-   </property>
-  </action>
-  <action name="actionOpen">
-   <property name="icon">
-    <iconset>
-     <normaloff>../Icons/folder--arrow.png</normaloff>../Icons/folder--arrow.png</iconset>
-   </property>
-   <property name="text">
-    <string>Open</string>
    </property>
   </action>
  </widget>

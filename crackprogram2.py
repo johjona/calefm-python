@@ -6,8 +6,6 @@ Main branch
 
 """
 
-
-
 import sys
 import numpy as np
 from PyQt5.QtCore import QThread, QSize
@@ -39,6 +37,9 @@ class MainWindow(QMainWindow):
     
     def __init__(self):
         super(QMainWindow, self).__init__()
+        
+        self.calc_done = False
+        self.mesh_created = False
         
         # Initialise input and output data variables
         self.savePoints = True
@@ -145,6 +146,8 @@ class MainWindow(QMainWindow):
         self.figure.canvas.draw()
         self.figure.canvas.flush_events()
         self.figure.canvas.update()
+        self.mesh_created = False
+        self.calc_done = False
         
         
     def onCreateLoad(self):
@@ -332,6 +335,8 @@ class MainWindow(QMainWindow):
         """ Function for calling the CALFEM mesh creation based on the geometry
         """
         self.solver.create_mesh()
+        self.mesh_created = True
+    
 
     
     def onShowGeometry(self):  
@@ -343,7 +348,10 @@ class MainWindow(QMainWindow):
         
         # If the list of points is empty pass, otherwise plot the figure
         if not self.input_data.points:
-            pass
+            msgbox = QMessageBox()
+            msgbox.setText('Geometry need to be created before it can be visualised.')
+            msgbox.setStandardButtons(QMessageBox.Ok)
+            msgbox.exec()
         else:
             self.vis.showGeometry()
         
@@ -354,26 +362,38 @@ class MainWindow(QMainWindow):
 
     def onShowMesh(self):
         """ Function for plotting the mesh when the user wants to display it
-        """
+        """ 
         output_string = "Creating mesh with element size " + str(self.input_data.el_size_factor) + "..."
         self.outputTextBrowser.append(output_string)
-        self.createMesh()
-        self.figure.clear()
-        self.vis.showMesh()
-        self.figure.canvas.draw()
-        self.figure.canvas.flush_events()
-        self.figure.canvas.update()
-        self.outputTextBrowser.append("...Mesh created.")
+        try:
+            self.createMesh()
+            self.figure.clear()
+            self.vis.showMesh()
+            self.figure.canvas.draw()
+            self.figure.canvas.flush_events()
+            self.figure.canvas.update()
+            self.outputTextBrowser.append("...Mesh created.")
+        except:
+            msgbox = QMessageBox()
+            msgbox.setText('Geometry need to be created before meshing.')
+            msgbox.setStandardButtons(QMessageBox.Ok)
+            msgbox.exec()
         
 
     def onShowDisplacements(self):
         """ Function for plotting the displacements when the user wants to display them
         """
-        self.figure.clear()
-        self.vis.showDisplacements()
-        self.figure.canvas.draw()
-        self.figure.canvas.flush_events()
-        self.figure.canvas.update()
+        if not self.calc_done:
+            msgbox = QMessageBox()
+            msgbox.setText('Calculation need to be run before visualising displacments.')
+            msgbox.setStandardButtons(QMessageBox.Ok)
+            msgbox.exec()
+        else:
+            self.figure.clear()
+            self.vis.showDisplacements()
+            self.figure.canvas.draw()
+            self.figure.canvas.flush_events()
+            self.figure.canvas.update()
         
         
     def showEnergyReleaseRate(self):  
@@ -415,45 +435,58 @@ class MainWindow(QMainWindow):
     def onActionRunCalc(self):
         """ Function for running a CALFEM calculation
         """
-        # Disable UI and update model parameters
-        self.ui.setEnabled(False)
-        self.updateModel()
         
-        # Single linear elastic calculation
-        if self.ui.linearElasticCalc.isChecked():
-            self.solverThread = SolverThread(self.solver)
-            self.solverThread.finished.connect(self.onSolverFinished)
-            self.solverThread.start()
+        # Only run calc if mesh has been created
+    
+        if self.mesh_created:
             
-       # Linear compliance calculation
-        elif self.ui.complianceCalcButton.isChecked(): 
+            # Disable UI and update model parameters
             
-            # Instansiate a compliance calculation object
-            self.compliance_object = un.ComplianceCalc(self.input_data, self.output_data)
-            
-            # Reset compliance calculation lists
-            self.G = []
-            self.input_data_list = []
-            self.output_data_list = []
-            self.solver_list = []
-            self.vis_list = []
-            
-            # Display warning for small increment size in relation to mesh size
-            if (self.input_data.el_size_factor > self.input_data.crack_increment):
-                msgbox = QMessageBox()
-                msgbox.setText('Using a increment size smaller then the element size might yield inaccurate results.')
-                msgbox.setStandardButtons(QMessageBox.Ok)
-                msgbox.exec()
-            
-            # Call a function which creates a list of tuples with input/output/visuaisation/solver objects.
-            self.solver_list = self.compliance_object.generateComplianceList()
-            
-            # Solve all solver objects in the tuple list
-            for idx1, solver_pair in enumerate(self.solver_list):
-                for solver in solver_pair:
-                    self.solverThread = SolverThread(solver)
-                    self.solverThread.finished.connect(self.onSolverFinished)
-                    self.solverThread.start()
+            self.ui.setEnabled(False)
+            self.updateModel()
+        
+            # Single linear elastic calculation
+            if self.ui.linearElasticCalc.isChecked():
+                self.solverThread = SolverThread(self.solver)
+                self.solverThread.finished.connect(self.onSolverFinished)
+                self.solverThread.start()
+                
+           # Linear compliance calculation
+            elif self.ui.complianceCalcButton.isChecked(): 
+                
+                # Instansiate a compliance calculation object
+                self.compliance_object = un.ComplianceCalc(self.input_data, self.output_data)
+                
+                # Reset compliance calculation lists
+                self.G = []
+                self.input_data_list = []
+                self.output_data_list = []
+                self.solver_list = []
+                self.vis_list = []
+                
+                # Display warning for small increment size in relation to mesh size
+                if (self.input_data.el_size_factor > self.input_data.crack_increment):
+                    msgbox = QMessageBox()
+                    msgbox.setText('Using a increment size smaller then the element size might yield inaccurate results.')
+                    msgbox.setStandardButtons(QMessageBox.Ok)
+                    msgbox.exec()
+                
+                # Call a function which creates a list of tuples with input/output/visuaisation/solver objects.
+                self.solver_list = self.compliance_object.generateComplianceList()
+                
+                # Solve all solver objects in the tuple list
+                for idx1, solver_pair in enumerate(self.solver_list):
+                    for solver in solver_pair:
+                        self.solverThread = SolverThread(solver)
+                        self.solverThread.finished.connect(self.onSolverFinished)
+                        self.solverThread.start()
+        else:
+            msgbox = QMessageBox()
+            msgbox.setText('Mesh needs to be created before running calculations.')
+            msgbox.setStandardButtons(QMessageBox.Ok)
+            msgbox.exec()
+                    
+        self.calc_done = True
                     
                            
     def onSolverFinished(self):
