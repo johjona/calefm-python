@@ -430,10 +430,8 @@ class Solver:
         self.output_data.K = K 
       
         a = self.output_data.a
-        coords = self.output_data.coords
-        edof = self.output_data.edof
-        dofs_per_node = self.input_data.dofs_per_node
-        el_type = self.input_data.el_type
+        
+        # Calculate strain energy
                 
         U = np.transpose(a)*K*a
         self.output_data.U = U.item()
@@ -477,69 +475,3 @@ class Solver:
         
         return D
         
-    
-################### MAIN STARTS HERE #####################   
-
-# Initialize input and output data classes
-
-
-#rack_length_list = np.linspace(0.1, 0.15, 1)
-
-# if __name__ == "__main__":
-    
-#     U = []
-    
-#     #for idx, crack_length in enumerate(crack_length_list):   
-#     output_data = OutputData()
-#     input_data = InputData()
-#     input_data.crack_length = 0.25
-#     input_data.crack_location = 2
-#     input_data.crack_increment = 0.01
-#    # input_data.points = [[0,0], [0.5,0], [1,0], [1,0.25], [0.5,0.25], [0,0.25]]
-#     input_data.points = [[0,0], [0.3, 0], [0.3,-0.1], [1.5,-0.1], [1.5, 0], [1.5,0.3], [0.5, 0.3], [0,0.3]]
-    
-#     # BOUNDARY CONDITIONS 
-    
-#     bc_identifier = [10]*len(input_data.points)
-    
-#     bcmarker = 20
-#     bcmarker2 = 40
-#     loadmarker = 30
-    
-#     bc_points = [5,7]
-#     bc_identifier[bc_points[0]:bc_points[1]] = [bcmarker]*(bc_points[1]-bc_points[0])
-    
-#     bc2_points = [1,0]
-#     bc_identifier[bc2_points[0]:bc2_points[1]] = [bcmarker2]*(bc2_points[1]-bc2_points[0])
-    
-#     # Load conditions
-    
-#     load_points = [7,9]
-    
-#     bc_identifier[load_points[0]:load_points[1]] = [loadmarker]*(load_points[1]-load_points[0])
-    
-#     # Initialize solver
-    
-#     solver = Solver(input_data, output_data)
-    
-#     # Execute solver
-    
-#     solver.execute()
-    
-#     vis = Visualisation(input_data, output_data)
-#     vis.showGeometry()
-#     vis.showMesh()
-#     vis.showDeformedMesh()
-
-#     # U.append(np.transpose(output_data.a)*output_data.K*output_data.a)
-    
-#     # print('The strain energy is: ', U[idx])
-    
-#     # G = (U[1] - U[0])/0.001
-    
-#     # mu = input_data.E/(2*(1+input_data.v))
-#     # kappa = (3-input_data.v)/(1+input_data.v)
-#     # K_1 = sqrt((8*mu*G)/(1 + kappa))
-    
-#     # print('The energy release rate is', G)
-#     # print('The stress intensity factor is', K_1)
